@@ -1,0 +1,26 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+:root {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f8f9fa;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --primary-color: #007bff;
+  --primary-hover: #0056b3;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --border-color: #dee2e6;
+  --bg-hover: #f8f9fa;
+  --font-base: system-ui, -apple-system, sans-serif;
+}

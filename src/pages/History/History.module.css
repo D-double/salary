@@ -1,0 +1,102 @@
+/* Контейнер страницы истории */
+.history {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Заголовок страницы */
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--text-primary, #212529);
+  margin: 0;
+}
+
+/* Панель фильтров */
+.filters {
+  background-color: var(--bg-secondary, #ffffff);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+/* Группа фильтра */
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.filterLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary, #6c757d);
+}
+
+.filterSelect {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color, #dee2e6);
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: white;
+  cursor: pointer;
+}
+
+.filterSelect:focus {
+  outline: none;
+  border-color: var(--primary-color, #007bff);
+}
+
+/* Кнопка сброса фильтров */
+.resetButton {
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  color: var(--primary-color, #007bff);
+  border: 1px solid var(--primary-color, #007bff);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+}
+
+.resetButton:hover {
+  background-color: var(--primary-color, #007bff);
+  color: white;
+}
+
+/* Контейнер списка операций */
+.listContainer {
+  background-color: var(--bg-secondary, #ffffff);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Кнопка добавления операции */
+.addButton {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--primary-color, #007bff);
+  color: white;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.addButton:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}

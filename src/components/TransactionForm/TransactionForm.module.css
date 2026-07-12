@@ -1,0 +1,162 @@
+/* Контейнер формы */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Переключатель типа операции (доход/расход) */
+.typeToggle {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--border-color, #dee2e6);
+}
+
+.typeButton {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  background-color: var(--bg-secondary, #ffffff);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  color: var(--text-secondary, #6c757d);
+}
+
+.typeButton:first-child {
+  border-right: 1px solid var(--border-color, #dee2e6);
+}
+
+.typeButtonIncomeActive {
+  background-color: var(--success-color, #28a745);
+  color: white;
+}
+
+.typeButtonExpenseActive {
+  background-color: var(--danger-color, #dc3545);
+  color: white;
+}
+
+/* Группа поля формы */
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fieldLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary, #6c757d);
+}
+
+.fieldInput,
+.fieldSelect {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color, #dee2e6);
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: white;
+  transition: border-color 0.2s;
+}
+
+.fieldInput:focus,
+.fieldSelect:focus {
+  outline: none;
+  border-color: var(--primary-color, #007bff);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+.fieldTextarea {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color, #dee2e6);
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.2s;
+}
+
+.fieldTextarea:focus {
+  outline: none;
+  border-color: var(--primary-color, #007bff);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+/* Строка из двух полей (дата + сумма) */
+.rowFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Ошибка валидации */
+.fieldError {
+  border-color: var(--danger-color, #dc3545) !important;
+}
+
+.errorText {
+  font-size: 0.75rem;
+  color: var(--danger-color, #dc3545);
+  margin: 0;
+}
+
+/* Кнопки действий */
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color, #dee2e6);
+}
+
+.submitButton {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-color, #007bff);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submitButton:hover {
+  background-color: var(--primary-hover, #0056b3);
+}
+
+.cancelButton {
+  padding: 0.75rem 1.5rem;
+  background-color: transparent;
+  color: var(--text-secondary, #6c757d);
+  border: 1px solid var(--border-color, #dee2e6);
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.cancelButton:hover {
+  background-color: var(--bg-tertiary, #f8f9fa);
+  color: var(--text-primary, #212529);
+}
+
+@media (max-width: 480px) {
+  .rowFields {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .submitButton,
+  .cancelButton {
+    width: 100%;
+  }
+}

@@ -1,0 +1,58 @@
+/* Контейнер дашборда */
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Заголовок страницы */
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--text-primary, #212529);
+  margin: 0;
+}
+
+/* Сетка карточек баланса */
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Секция последних операций */
+.recentSection {
+  background-color: var(--bg-secondary, #ffffff);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary, #212529);
+}
+
+/* Кнопка добавления операции (плавающая) */
+.addButton {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--primary-color, #007bff);
+  color: white;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.addButton:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}

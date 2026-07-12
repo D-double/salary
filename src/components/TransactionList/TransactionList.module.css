@@ -1,0 +1,143 @@
+/* Контейнер таблицы */
+.list {
+  width: 100%;
+}
+
+/* Заголовок таблицы */
+.header {
+  display: grid;
+  grid-template-columns: 120px 1fr 150px 100px;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: var(--bg-tertiary, #f8f9fa);
+  border-radius: 8px 8px 0 0;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6c757d);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Строка операции */
+.row {
+  display: grid;
+  grid-template-columns: 120px 1fr 150px 100px;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color, #dee2e6);
+  transition: background-color 0.2s;
+  align-items: center;
+}
+
+.row:hover {
+  background-color: var(--bg-hover, #f8f9fa);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+/* Ячейка даты */
+.date {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6c757d);
+}
+
+/* Ячейка описания */
+.description {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.categoryIcon {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-tertiary, #f8f9fa);
+  border-radius: 8px;
+}
+
+.categoryInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.categoryName {
+  font-weight: 500;
+  color: var(--text-primary, #212529);
+}
+
+.comment {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6c757d);
+}
+
+/* Ячейка суммы */
+.amount {
+  font-weight: 600;
+  font-size: 1.125rem;
+  text-align: right;
+}
+
+.income {
+  color: var(--success-color, #28a745);
+}
+
+.expense {
+  color: var(--danger-color, #dc3545);
+}
+
+/* Ячейка действий */
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  font-size: 1.25rem;
+}
+
+.actionButton:hover {
+  background-color: var(--bg-tertiary, #f8f9fa);
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+  .header {
+    display: none;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 1rem;
+    position: relative;
+  }
+
+  .date {
+    font-size: 0.75rem;
+  }
+
+  .amount {
+    text-align: left;
+    font-size: 1.25rem;
+  }
+
+  .actions {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+}

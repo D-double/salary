@@ -1,0 +1,45 @@
+/* Контейнер хедера */
+.header {
+  background-color: var(--bg-secondary, #ffffff);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Логотип */
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary-color, #007bff);
+  text-decoration: none;
+}
+
+/* Навигация */
+.nav {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ссылка навигации */
+.navLink {
+  color: var(--text-secondary, #6c757d);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.navLink:hover {
+  color: var(--primary-color, #007bff);
+}
+
+/* Активная ссылка */
+.activeLink {
+  color: var(--primary-color, #007bff);
+  border-bottom: 2px solid var(--primary-color, #007bff);
+  padding-bottom: 0.25rem;
+}

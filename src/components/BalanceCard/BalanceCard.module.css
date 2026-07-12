@@ -1,0 +1,46 @@
+/* Контейнер карточки */
+.card {
+  background-color: var(--bg-secondary, #ffffff);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid var(--accent-color, #007bff);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Заголовок карточки */
+.title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary, #6c757d);
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Сумма */
+.amount {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--accent-color, #007bff);
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Дополнительные стили для разных типов */
+.income {
+  --accent-color: #28a745;
+}
+
+.expense {
+  --accent-color: #dc3545;
+}
+
+.balance {
+  --accent-color: #007bff;
+}
