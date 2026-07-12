@@ -30,29 +30,22 @@ function json(data, status = 200) {
   });
 }
 
-function parseBody(event) {
-  if (!event.body) return {};
-  const raw = event.isBase64Encoded
-    ? atob(event.body)
-    : event.body;
-  return JSON.parse(raw);
+async function parseBody(request) {
+  const text = await request.text();
+  if (!text) return {};
+  return JSON.parse(text);
 }
 
-function getApiPath(event) {
-  const p = event.path;
-  const prefix = '/.netlify/functions/api';
-  if (p.startsWith(prefix)) return p.slice(prefix.length) || '/';
-  return p;
-}
-
-export default async (event) => {
+export default async (request) => {
   await ensureDb();
 
-  const { httpMethod, queryStringParameters } = event;
-  const apiPath = getApiPath(event);
+  const url = new URL(request.url);
+  const method = request.method;
+  const apiPath = url.pathname.replace(/^\/\.netlify\/functions\/api/, '') || '/';
+  const params = Object.fromEntries(url.searchParams);
 
   try {
-    if (httpMethod === 'GET' && apiPath === '/transactions/summary/balance') {
+    if (method === 'GET' && apiPath === '/transactions/summary/balance') {
       const result = await get(`
         SELECT
           COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) AS totalIncome,
@@ -66,8 +59,8 @@ export default async (event) => {
       });
     }
 
-    if (httpMethod === 'GET' && apiPath === '/transactions/summary/category') {
-      const type = queryStringParameters?.type || 'expense';
+    if (method === 'GET' && apiPath === '/transactions/summary/category') {
+      const type = params.type || 'expense';
       if (!['income', 'expense'].includes(type)) {
         return json({ error: 'type должен быть income или expense' }, 400);
       }
@@ -78,8 +71,8 @@ export default async (event) => {
       `, [type]));
     }
 
-    if (httpMethod === 'GET' && apiPath === '/transactions/summary/monthly') {
-      const monthsCount = parseInt(queryStringParameters?.months) || 6;
+    if (method === 'GET' && apiPath === '/transactions/summary/monthly') {
+      const monthsCount = parseInt(params.months) || 6;
       return json(await all(`
         SELECT
           substr(date, 1, 7) AS monthKey,
@@ -91,28 +84,28 @@ export default async (event) => {
       `, [monthsCount]));
     }
 
-    if (httpMethod === 'GET' && apiPath === '/transactions/recent') {
-      const limit = parseInt(queryStringParameters?.limit) || 5;
+    if (method === 'GET' && apiPath === '/transactions/recent') {
+      const limit = parseInt(params.limit) || 5;
       return json(await all(
         'SELECT * FROM transactions ORDER BY date DESC, createdAt DESC LIMIT ?',
         [limit]
       ));
     }
 
-    if (httpMethod === 'GET' && apiPath === '/transactions') {
+    if (method === 'GET' && apiPath === '/transactions') {
       let sql = 'SELECT * FROM transactions WHERE 1=1';
-      const params = [];
-      const { type, category, dateFrom, dateTo } = queryStringParameters || {};
-      if (type) { sql += ' AND type = ?'; params.push(type); }
-      if (category) { sql += ' AND category = ?'; params.push(category); }
-      if (dateFrom) { sql += ' AND date >= ?'; params.push(dateFrom); }
-      if (dateTo) { sql += ' AND date <= ?'; params.push(dateTo); }
+      const sqlParams = [];
+      if (params.type) { sql += ' AND type = ?'; sqlParams.push(params.type); }
+      if (params.category) { sql += ' AND category = ?'; sqlParams.push(params.category); }
+      if (params.dateFrom) { sql += ' AND date >= ?'; sqlParams.push(params.dateFrom); }
+      if (params.dateTo) { sql += ' AND date <= ?'; sqlParams.push(params.dateTo); }
       sql += ' ORDER BY date DESC, createdAt DESC';
-      return json(await all(sql, params));
+      return json(await all(sql, sqlParams));
     }
 
-    if (httpMethod === 'POST' && apiPath === '/transactions') {
-      const { type, category, amount, date, comment } = parseBody(event);
+    if (method === 'POST' && apiPath === '/transactions') {
+      const body = await parseBody(request);
+      const { type, category, amount, date, comment } = body;
       if (!type || !category || amount == null || !date) {
         return json({ error: 'Обязательные поля: type, category, amount, date' }, 400);
       }
@@ -136,17 +129,17 @@ export default async (event) => {
     if (idMatch) {
       const id = idMatch[1];
 
-      if (httpMethod === 'GET') {
+      if (method === 'GET') {
         const transaction = await get('SELECT * FROM transactions WHERE id = ?', [id]);
         if (!transaction) return json({ error: 'Транзакция не найдена' }, 404);
         return json(transaction);
       }
 
-      if (httpMethod === 'PUT') {
+      if (method === 'PUT') {
         const existing = await get('SELECT * FROM transactions WHERE id = ?', [id]);
         if (!existing) return json({ error: 'Транзакция не найдена' }, 404);
 
-        const body = parseBody(event);
+        const body = await parseBody(request);
         const updatedType = body.type ?? existing.type;
         const updatedCategory = body.category ?? existing.category;
         const updatedAmount = body.amount != null ? parseFloat(body.amount) : existing.amount;
@@ -168,7 +161,7 @@ export default async (event) => {
         return json(await get('SELECT * FROM transactions WHERE id = ?', [id]));
       }
 
-      if (httpMethod === 'DELETE') {
+      if (method === 'DELETE') {
         const existing = await get('SELECT * FROM transactions WHERE id = ?', [id]);
         if (!existing) return json({ error: 'Транзакция не найдена' }, 404);
         await run('DELETE FROM transactions WHERE id = ?', [id]);
