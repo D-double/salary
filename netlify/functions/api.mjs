@@ -2,19 +2,19 @@ import serverless from 'serverless-http';
 import app from '../../server/app.js';
 import { initDb } from '../../server/db.js';
 
-let initialized = false;
+let handler;
 
-async function ensureDb() {
-  if (!initialized) {
+async function getHandler() {
+  if (!handler) {
     await initDb();
-    initialized = true;
+    handler = serverless(app);
   }
+  return handler;
 }
 
 export default async (request, context) => {
-  await ensureDb();
-  const handler = serverless(app);
-  return handler(request, context);
+  const h = await getHandler();
+  return h(request, context);
 };
 
 export const config = {

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { db } from '../db.js';
+import asyncHandler from '../asyncHandler.js';
 
 const router = Router();
 
@@ -17,7 +18,7 @@ async function run(sql, params = []) {
   await db.execute({ sql, args: params });
 }
 
-router.get('/', async (req, res) => {
+router.get('/', asyncHandler(async (req, res) => {
   const { type, category, dateFrom, dateTo } = req.query;
 
   let sql = 'SELECT * FROM transactions WHERE 1=1';
@@ -47,9 +48,9 @@ router.get('/', async (req, res) => {
 
   const transactions = await all(sql, params);
   res.json(transactions);
-});
+}));
 
-router.get('/recent', async (req, res) => {
+router.get('/recent', asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit) || 5;
 
   const transactions = await all(
@@ -58,9 +59,9 @@ router.get('/recent', async (req, res) => {
   );
 
   res.json(transactions);
-});
+}));
 
-router.get('/summary/balance', async (_req, res) => {
+router.get('/summary/balance', asyncHandler(async (_req, res) => {
   const result = await get(`
     SELECT
       COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) AS totalIncome,
@@ -73,9 +74,9 @@ router.get('/summary/balance', async (_req, res) => {
     expense: result.totalExpense,
     balance: result.totalIncome - result.totalExpense
   });
-});
+}));
 
-router.get('/summary/category', async (req, res) => {
+router.get('/summary/category', asyncHandler(async (req, res) => {
   const { type = 'expense' } = req.query;
 
   if (!['income', 'expense'].includes(type)) {
@@ -91,9 +92,9 @@ router.get('/summary/category', async (req, res) => {
   `, [type]);
 
   res.json(categories);
-});
+}));
 
-router.get('/summary/monthly', async (req, res) => {
+router.get('/summary/monthly', asyncHandler(async (req, res) => {
   const monthsCount = parseInt(req.query.months) || 6;
 
   const months = await all(`
@@ -108,9 +109,9 @@ router.get('/summary/monthly', async (req, res) => {
   `, [monthsCount]);
 
   res.json(months);
-});
+}));
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', asyncHandler(async (req, res) => {
   const transaction = await get('SELECT * FROM transactions WHERE id = ?', [req.params.id]);
 
   if (!transaction) {
@@ -118,9 +119,9 @@ router.get('/:id', async (req, res) => {
   }
 
   res.json(transaction);
-});
+}));
 
-router.post('/', async (req, res) => {
+router.post('/', asyncHandler(async (req, res) => {
   const { type, category, amount, date, comment } = req.body;
 
   if (!type || !category || amount == null || !date) {
@@ -146,9 +147,9 @@ router.post('/', async (req, res) => {
 
   const transaction = await get('SELECT * FROM transactions WHERE id = ?', [id]);
   res.status(201).json(transaction);
-});
+}));
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', asyncHandler(async (req, res) => {
   const existing = await get('SELECT * FROM transactions WHERE id = ?', [req.params.id]);
 
   if (!existing) {
@@ -180,9 +181,9 @@ router.put('/:id', async (req, res) => {
 
   const transaction = await get('SELECT * FROM transactions WHERE id = ?', [req.params.id]);
   res.json(transaction);
-});
+}));
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', asyncHandler(async (req, res) => {
   const existing = await get('SELECT * FROM transactions WHERE id = ?', [req.params.id]);
 
   if (!existing) {
@@ -191,6 +192,6 @@ router.delete('/:id', async (req, res) => {
 
   await run('DELETE FROM transactions WHERE id = ?', [req.params.id]);
   res.status(204).send();
-});
+}));
 
 export default router;
