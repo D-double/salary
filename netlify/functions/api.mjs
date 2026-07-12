@@ -30,22 +30,15 @@ function json(data, status = 200) {
   });
 }
 
-async function parseBody(request) {
-  const text = await request.text();
-  if (!text) return {};
-  return JSON.parse(text);
-}
-
-export default async (request) => {
+export default async (req) => {
   await ensureDb();
 
-  const url = new URL(request.url);
-  const method = request.method;
-  const apiPath = url.pathname.replace(/^\/\.netlify\/functions\/api/, '') || '/';
-  const params = Object.fromEntries(url.searchParams);
+  const url = new URL(req.url);
+  const path = url.pathname;
+  const method = req.method;
 
   try {
-    if (method === 'GET' && apiPath === '/transactions/summary/balance') {
+    if (method === 'GET' && path === '/api/transactions/summary/balance') {
       const result = await get(`
         SELECT
           COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) AS totalIncome,
@@ -59,8 +52,8 @@ export default async (request) => {
       });
     }
 
-    if (method === 'GET' && apiPath === '/transactions/summary/category') {
-      const type = params.type || 'expense';
+    if (method === 'GET' && path === '/api/transactions/summary/category') {
+      const type = url.searchParams.get('type') || 'expense';
       if (!['income', 'expense'].includes(type)) {
         return json({ error: 'type должен быть income или expense' }, 400);
       }
@@ -71,8 +64,8 @@ export default async (request) => {
       `, [type]));
     }
 
-    if (method === 'GET' && apiPath === '/transactions/summary/monthly') {
-      const monthsCount = parseInt(params.months) || 6;
+    if (method === 'GET' && path === '/api/transactions/summary/monthly') {
+      const monthsCount = parseInt(url.searchParams.get('months')) || 6;
       return json(await all(`
         SELECT
           substr(date, 1, 7) AS monthKey,
@@ -84,27 +77,31 @@ export default async (request) => {
       `, [monthsCount]));
     }
 
-    if (method === 'GET' && apiPath === '/transactions/recent') {
-      const limit = parseInt(params.limit) || 5;
+    if (method === 'GET' && path === '/api/transactions/recent') {
+      const limit = parseInt(url.searchParams.get('limit')) || 5;
       return json(await all(
         'SELECT * FROM transactions ORDER BY date DESC, createdAt DESC LIMIT ?',
         [limit]
       ));
     }
 
-    if (method === 'GET' && apiPath === '/transactions') {
+    if (method === 'GET' && path === '/api/transactions') {
       let sql = 'SELECT * FROM transactions WHERE 1=1';
-      const sqlParams = [];
-      if (params.type) { sql += ' AND type = ?'; sqlParams.push(params.type); }
-      if (params.category) { sql += ' AND category = ?'; sqlParams.push(params.category); }
-      if (params.dateFrom) { sql += ' AND date >= ?'; sqlParams.push(params.dateFrom); }
-      if (params.dateTo) { sql += ' AND date <= ?'; sqlParams.push(params.dateTo); }
+      const params = [];
+      const type = url.searchParams.get('type');
+      const category = url.searchParams.get('category');
+      const dateFrom = url.searchParams.get('dateFrom');
+      const dateTo = url.searchParams.get('dateTo');
+      if (type) { sql += ' AND type = ?'; params.push(type); }
+      if (category) { sql += ' AND category = ?'; params.push(category); }
+      if (dateFrom) { sql += ' AND date >= ?'; params.push(dateFrom); }
+      if (dateTo) { sql += ' AND date <= ?'; params.push(dateTo); }
       sql += ' ORDER BY date DESC, createdAt DESC';
-      return json(await all(sql, sqlParams));
+      return json(await all(sql, params));
     }
 
-    if (method === 'POST' && apiPath === '/transactions') {
-      const body = await parseBody(request);
+    if (method === 'POST' && path === '/api/transactions') {
+      const body = await req.json().catch(() => ({}));
       const { type, category, amount, date, comment } = body;
       if (!type || !category || amount == null || !date) {
         return json({ error: 'Обязательные поля: type, category, amount, date' }, 400);
@@ -125,7 +122,7 @@ export default async (request) => {
       return json(await get('SELECT * FROM transactions WHERE id = ?', [id]), 201);
     }
 
-    const idMatch = apiPath.match(/^\/transactions\/([^/]+)$/);
+    const idMatch = path.match(/^\/api\/transactions\/([^/]+)$/);
     if (idMatch) {
       const id = idMatch[1];
 
@@ -139,7 +136,7 @@ export default async (request) => {
         const existing = await get('SELECT * FROM transactions WHERE id = ?', [id]);
         if (!existing) return json({ error: 'Транзакция не найдена' }, 404);
 
-        const body = await parseBody(request);
+        const body = await req.json().catch(() => ({}));
         const updatedType = body.type ?? existing.type;
         const updatedCategory = body.category ?? existing.category;
         const updatedAmount = body.amount != null ? parseFloat(body.amount) : existing.amount;
@@ -174,4 +171,8 @@ export default async (request) => {
     console.error(err);
     return json({ error: err.message || 'Internal server error' }, 500);
   }
+};
+
+export const config = {
+  path: '/api/*',
 };
