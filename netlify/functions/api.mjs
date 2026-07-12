@@ -60,58 +60,50 @@ export default async (event) => {
       },
       end(chunk) {
         if (chunk) resBody += chunk;
-        resolve({
-          statusCode: resStatusCode,
+        resolve(new Response(resBody, {
+          status: resStatusCode,
           headers: resHeaders,
-          body: resBody,
-          isBase64Encoded: false,
-        });
+        }));
         return this;
       },
       status(code) { resStatusCode = code; this.statusCode = code; return this; },
       json(data) {
         resHeaders['content-type'] = 'application/json';
-        resBody = JSON.stringify(data);
-        resolve({
-          statusCode: resStatusCode,
+        resolve(new Response(JSON.stringify(data), {
+          status: resStatusCode,
           headers: resHeaders,
-          body: resBody,
-          isBase64Encoded: false,
-        });
+        }));
       },
       send(data) {
         if (typeof data === 'string') {
           resHeaders['content-type'] = resHeaders['content-type'] || 'text/plain';
-          resBody = data;
+          resolve(new Response(data, {
+            status: resStatusCode,
+            headers: resHeaders,
+          }));
+        } else if (Buffer.isBuffer(data)) {
+          resolve(new Response(data, {
+            status: resStatusCode,
+            headers: resHeaders,
+          }));
         } else {
-          resBody = JSON.stringify(data);
           resHeaders['content-type'] = 'application/json';
+          resolve(new Response(JSON.stringify(data), {
+            status: resStatusCode,
+            headers: resHeaders,
+          }));
         }
-        resolve({
-          statusCode: resStatusCode,
-          headers: resHeaders,
-          body: resBody,
-          isBase64Encoded: false,
-        });
       },
       sendStatus(code) {
-        resStatusCode = code;
-        resolve({
-          statusCode: code,
-          headers: resHeaders,
-          body: '',
-          isBase64Encoded: false,
-        });
+        resolve(new Response(null, { status: code, headers: resHeaders }));
       },
     };
 
     app(reqStream, res, () => {
-      resolve({
-        statusCode: 404,
+      resolve(new Response(JSON.stringify({ error: 'Not found' }), {
+        status: 404,
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ error: 'Not found' }),
-        isBase64Encoded: false,
-      });
+      }));
     });
   });
 };
